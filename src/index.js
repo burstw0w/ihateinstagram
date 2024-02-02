@@ -32,7 +32,7 @@ const client = new Client({
     ],
 });
 
-client.login("MTA4NjM1MTQyOTM5ODE2NzU2Mg.Gfj9MB.82evPli13IYjdvrBH9DmlECrAIe9rTMq0knJtM"); //This is my old token, don't worry. You should change it to your own, otherwise your bot wont work!
+client.login(INSERT_TOKEN_HERE);
 
 client.on('ready', (c) =>{
     console.log('Bot radi')
