@@ -15,7 +15,7 @@
 
   <h2 align="center">I Hate Instagram*</h2>
   <p align="center">
-    *And TikTok too. This is a small bot that downloads videos from Insta and TikTok links sent to discord, and then uploads them so you could actually watch them inside your app without opening any links!
+    *And TikTok, Twitter, Reddit, Pinterest too. This is a small bot that downloads videos from Insta and TikTok links sent to discord, and then uploads them so you could actually watch them inside your app without opening any links!
     <br />
 </p>
 
