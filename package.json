@@ -4,7 +4,10 @@
     "cheerio": "^1.0.0-rc.12",
     "discord.js": "^14.14.1",
     "downloadjs": "^1.4.7",
+    "get-twitter-media": "^2.0.8",
+    "instagram-url-direct": "^2.0.3",
     "node-fetch": "^3.3.2",
-    "puppeteer": "^21.10.0"
+    "puppeteer": "^21.10.0",
+    "tiktokdl": "^0.0.5"
   }
 }
