@@ -6,6 +6,8 @@ const fs = require("fs");
 const puppeteer = require("puppeteer");
 const axios = require("axios");
 const getTwitterMedia = require("get-twitter-media");
+const util = require('util');
+const exec = util.promisify(require('child_process').exec);
 
 const client = new Client({
   intents: [
@@ -108,10 +110,36 @@ async function handleUrl(msg) {
             await downloadVideo(videoUrl, fname);
             const result = checkFileSize(fname, velicina);
             if (result === 0) {
-              await msg.reply({ content: 'Фајл је превелик јебигони' })
-              deleteFileAsync(fname);
-              return;
+              await msg.reply({ content: 'Превелик фајл, ајд да пробам да компресујем' });
+              const { shouldCompress, compressedFilePath } = await handleVideoCompression(fname, velicina);
+              
+              if (shouldCompress) {
+                const compressedResult = checkFileSize(compressedFilePath, velicina);
+                if (compressedResult === 0) {
+                  await msg.reply({ content: 'Фајл је превелик и након компресије јебигони' });
+                  deleteFileAsync(fname);
+                  deleteFileAsync(compressedFilePath);
+                  return;
+                }
+                await msg
+                  .channel.send({
+                    content: "<@" + author + `> качи ` + '<' + check[0] + '> (компресовано)',
+                    files: [compressedFilePath],
+                  })
+                  .catch((err) => {
+                    console.log("Error during Export File " + err);
+                  });
+                msg.delete();
+                deleteFileAsync(fname);
+                deleteFileAsync(compressedFilePath);
+                return;
+              } else {
+                await msg.reply({ content: 'Фајл је превелик и за компресију јебигони' });
+                deleteFileAsync(fname);
+                return;
+              }
             }
+
             await msg
               .channel.send({
                 content: "<@" + author + `> качи ` + '<' + check[0] + '>',
@@ -159,10 +187,36 @@ async function handleUrl(msg) {
                 await downloadVideo(videoUrl, fname);
                 const result = checkFileSize(fname, velicina);
                 if (result === 0) {
-                  await msg.reply({ content: 'Фајл је превелик јебигони' })
-                  deleteFileAsync(fname);
-                  return;
+                  await msg.reply({ content: 'Превелик фајл, ајд да пробам да компресујем' });
+                  const { shouldCompress, compressedFilePath } = await handleVideoCompression(fname, velicina);
+                  
+                  if (shouldCompress) {
+                    const compressedResult = checkFileSize(compressedFilePath, velicina);
+                    if (compressedResult === 0) {
+                      await msg.reply({ content: 'Фајл је превелик и након компресије јебигони' });
+                      deleteFileAsync(fname);
+                      deleteFileAsync(compressedFilePath);
+                      return;
+                    }
+                    await msg
+                      .channel.send({
+                        content: "<@" + author + `> качи ` + '<' + check[0] + '> (компресовано)',
+                        files: [compressedFilePath],
+                      })
+                      .catch((err) => {
+                        console.log("Error during Export File " + err);
+                      });
+                    msg.delete();
+                    deleteFileAsync(fname);
+                    deleteFileAsync(compressedFilePath);
+                    return;
+                  } else {
+                    await msg.reply({ content: 'Фајл је превелик и за компресију јебигони' });
+                    deleteFileAsync(fname);
+                    return;
+                  }
                 }
+
                 await msg
                   .channel.send({
                     content: "<@" + author + `> качи ` + '<' + check[0] + '>',
@@ -260,10 +314,36 @@ async function handleUrl(msg) {
       let fnamett = "ttk" + generateRandomString() + ".mp4";
       await downloadVideo(videoUrl, fnamett);
       const result = checkFileSize(fnamett, velicina);
+
       if (result === 0) {
-        await msg.reply({ content: 'Фајл је превелик јебигони' })
-        deleteFileAsync(fnamett);
-        return;
+        await msg.reply({ content: 'Превелик фајл, ајд да пробам да компресујем' });
+        const { shouldCompress, compressedFilePath } = await handleVideoCompression(fnamett, velicina);
+        
+        if (shouldCompress) {
+          const compressedResult = checkFileSize(compressedFilePath, velicina);
+          if (compressedResult === 0) {
+            await msg.reply({ content: 'Фајл је превелик и након компресије јебигони' });
+            deleteFileAsync(fnamett);
+            deleteFileAsync(compressedFilePath);
+            return;
+          }
+          await msg
+            .channel.send({
+              content: "<@" + author + `> качи ` + '<' + check[0] + '> (компресовано)',
+              files: [compressedFilePath],
+            })
+            .catch((err) => {
+              console.log("Error during Export File " + err);
+            });
+          msg.delete();
+          deleteFileAsync(fnamett);
+          deleteFileAsync(compressedFilePath);
+          return;
+        } else {
+          await msg.reply({ content: 'Фајл је превелик и за компресију јебигони' });
+          deleteFileAsync(fnamett);
+          return;
+        }
       }
       await msg.channel.send({ content: "<@" + author + "> качи: " + '<' + check[0] + '>', files: [fnamett] })
         .catch((err) => {
@@ -271,61 +351,6 @@ async function handleUrl(msg) {
         });
       msg.delete();
       deleteFileAsync(fnamett);
-      //let data = await tiktokdl(check[0]);
-      /*let data = await Tiktok.Downloader(check[0], {
-              version: "v3", //  version: "v1" | "v2" | "v3"
-              proxy: "https" // Support Proxy Http, Https, Socks5
-      })
-      if(data.result.type === 'image'){
-              let fileList = []
-              for(let i = 0; i < data.result.images.length && i<10; i++){
-                      const url = data.result.images[i];
-                      let fname = "ttk" + generateRandomString() + ".jpg";
-                      await downloadImage(url, fname);
-                      const result = checkFileSize(fname, velicina);
-                      if(result === 0){
-                              deleteFileAsync(fname);
-                      }
-                      fileList.push(fname)
-              }
-              let replyFiles = fileList.map(filename => ({
-                      attachment: filename,
-                      name: filename.split('/').pop() // Use only the filename without path
-              }))
-
-              if(data.result.images.length>10){
-                      await msg.channel.send({
-                              content: "<@" + author +`> качи првих десет слика, остатак је на: `+ '<'+check[0]+'>',
-                              files: replyFiles
-                      });
-              }else{
-                      await msg.channel.send({
-                              content: "<@" + author +`> качи `+ '<'+check[0]+'>',
-                              files: replyFiles
-                      });
-              }
-
-              for (let i = 0; i < fileList.length; i++) {
-                      deleteFileAsync(fileList[i]);
-              }
-              return;
-
-      }
-      const videoUrl = data.result.videoHD || data.result.video2 || data.result.video1;
-      let fnamett = "ttk" + generateRandomString() + ".mp4";
-      await downloadVideo(videoUrl, fnamett);
-      const result = checkFileSize(fnamett, velicina);
-      if(result === 0){
-              await msg.reply({content: 'Фајл је превелик јебигони'})
-              deleteFileAsync(fnamett);
-              return;
-      }
-      await msg.channel.send({ content: "<@" + author + "> качи: " + '<'+check[0]+'>', files: [fnamett]})
-              .catch((err) => {
-                      console.log("Error during Export File " + err);
-              });
-      msg.delete();
-      deleteFileAsync(fnamett);*/
     } else if (check[0].includes("twitter")) {
       let media = await getTwitterMedia(check[0], {
         buffer: true,
@@ -336,15 +361,35 @@ async function handleUrl(msg) {
         await downloadVideo(videoUrl, fnamex);
         const result = checkFileSize(fnamex, velicina);
         if (result === 0) {
-          await msg.reply({ content: 'Фајл је превелик јебигони' })
-          deleteFileAsync(fnamex);
-          return;
+          await msg.reply({ content: 'Превелик фајл, ајд да пробам да компресујем' });
+          const { shouldCompress, compressedFilePath } = await handleVideoCompression(fnamex, velicina);
+          
+          if (shouldCompress) {
+            const compressedResult = checkFileSize(compressedFilePath, velicina);
+            if (compressedResult === 0) {
+              await msg.reply({ content: 'Фајл је превелик и након компресије јебигони' });
+              deleteFileAsync(fnamex);
+              deleteFileAsync(compressedFilePath);
+              return;
+            }
+            await msg
+              .channel.send({
+                content: "<@" + author + `> качи ` + '<' + check[0] + '> (компресовано)',
+                files: [compressedFilePath],
+              })
+              .catch((err) => {
+                console.log("Error during Export File " + err);
+              });
+            msg.delete();
+            deleteFileAsync(fnamex);
+            deleteFileAsync(compressedFilePath);
+            return;
+          } else {
+            await msg.reply({ content: 'Фајл је превелик и за компресију јебигони' });
+            deleteFileAsync(fnamex);
+            return;
+          }
         }
-        /*await msg
-                .reply({ content: msg.member.user.tag + ` качи ` + '<'+check[0]+'>'+':', files: [fnamex] })
-                .catch((err) => {
-                        console.log("Error during Export File " + err);
-                });*/
         await msg.channel.send({ content: "<@" + author + "> качи: " + '<' + check[0] + '>', files: [fnamex] })
           .catch((err) => {
             console.log("Error during Export File " + err);
@@ -363,15 +408,35 @@ async function handleUrl(msg) {
         await downloadVideo(videoUrl, fnametw);
         const result = checkFileSize(fnametw, velicina);
         if (result === 0) {
-          await msg.reply({ content: 'Фајл је превелик јебигони' })
-          deleteFileAsync(fnametw);
-          return;
+          await msg.reply({ content: 'Превелик фајл, ајд да пробам да компресујем' });
+          const { shouldCompress, compressedFilePath } = await handleVideoCompression(fnamew, velicina);
+          
+          if (shouldCompress) {
+            const compressedResult = checkFileSize(compressedFilePath, velicina);
+            if (compressedResult === 0) {
+              await msg.reply({ content: 'Фајл је превелик и након компресије јебигони' });
+              deleteFileAsync(fnametw);
+              deleteFileAsync(compressedFilePath);
+              return;
+            }
+            await msg
+              .channel.send({
+                content: "<@" + author + `> качи ` + '<' + check[0] + '> (компресовано)',
+                files: [compressedFilePath],
+              })
+              .catch((err) => {
+                console.log("Error during Export File " + err);
+              });
+            msg.delete();
+            deleteFileAsync(fnametw);
+            deleteFileAsync(compressedFilePath);
+            return;
+          } else {
+            await msg.reply({ content: 'Фајл је превелик и за компресију јебигони' });
+            deleteFileAsync(fnametw);
+            return;
+          }
         }
-        /*await msg
-                .reply({ content: msg.member.user.tag + ` качи ` + '<'+check[0]+'>'+':', files: [fnametw] })
-                .catch((err) => {
-                        console.log("Error during Export File " + err);
-                });*/
         await msg.channel.send({ content: "<@" + author + "> качи: " + '<' + check[0] + '>', files: [fnametw] })
           .catch((err) => {
             console.log("Error during Export File " + err);
@@ -386,15 +451,35 @@ async function handleUrl(msg) {
         await downloadVideo(media, fnamerd);
         const result = checkFileSize(fnamerd, velicina);
         if (result === 0) {
-          await msg.reply({ content: 'Фајл је превелик јебигони' })
-          deleteFileAsync(fnamerd);
-          return;
+          await msg.reply({ content: 'Превелик фајл, ајд да пробам да компресујем' });
+          const { shouldCompress, compressedFilePath } = await handleVideoCompression(fnamerd, velicina);
+          
+          if (shouldCompress) {
+            const compressedResult = checkFileSize(compressedFilePath, velicina);
+            if (compressedResult === 0) {
+              await msg.reply({ content: 'Фајл је превелик и након компресије јебигони' });
+              deleteFileAsync(fnamerd);
+              deleteFileAsync(compressedFilePath);
+              return;
+            }
+            await msg
+              .channel.send({
+                content: "<@" + author + `> качи ` + '<' + check[0] + '> (компресовано)',
+                files: [compressedFilePath],
+              })
+              .catch((err) => {
+                console.log("Error during Export File " + err);
+              });
+            msg.delete();
+            deleteFileAsync(fnamerd);
+            deleteFileAsync(compressedFilePath);
+            return;
+          } else {
+            await msg.reply({ content: 'Фајл је превелик и за компресију јебигони' });
+            deleteFileAsync(fnamerd);
+            return;
+          }
         }
-        /*await msg
-                .reply({ content: msg.member.user.tag + ` качи ` + '<'+check[0]+'>'+':', files: [fnamerd] })
-                .catch((err) => {
-                        console.log("Error during Export File " + err);
-                });*/
         await msg.channel.send({ content: "<@" + author + "> качи: " + '<' + check[0] + '>', files: [fnamerd] })
           .catch((err) => {
             console.log("Error during Export File " + err);
@@ -409,9 +494,34 @@ async function handleUrl(msg) {
         await downloadVideo(media, fnamepn);
         const result = checkFileSize(fnamepn, velicina);
         if (result === 0) {
-          await msg.reply({ content: 'Фајл је превелик јебигони' })
-          deleteFileAsync(fnamepn);
-          return;
+          await msg.reply({ content: 'Превелик фајл, ајд да пробам да компресујем' });
+          const { shouldCompress, compressedFilePath } = await handleVideoCompression(fnamepn, velicina);
+          
+          if (shouldCompress) {
+            const compressedResult = checkFileSize(compressedFilePath, velicina);
+            if (compressedResult === 0) {
+              await msg.reply({ content: 'Фајл је превелик и након компресије јебигони' });
+              deleteFileAsync(fnamepn);
+              deleteFileAsync(compressedFilePath);
+              return;
+            }
+            await msg
+              .channel.send({
+                content: "<@" + author + `> качи ` + '<' + check[0] + '> (компресовано)',
+                files: [compressedFilePath],
+              })
+              .catch((err) => {
+                console.log("Error during Export File " + err);
+              });
+            msg.delete();
+            deleteFileAsync(fnamepn);
+            deleteFileAsync(compressedFilePath);
+            return;
+          } else {
+            await msg.reply({ content: 'Фајл је превелик и за компресију јебигони' });
+            deleteFileAsync(fnamepn);
+            return;
+          }
         }
         await msg.channel.send({ content: "<@" + author + "> качи: " + '<' + check[0] + '>', files: [fnamepn] })
           .catch((err) => {
@@ -569,13 +679,10 @@ async function downloadImage(imageUrl, fileName) {
 
 async function checkFileType(url) {
   try {
-    // Send a HEAD request to get the headers of the file
     const headResponse = await axios.head(url);
 
-    // Get the Content-Type from the headers
     const contentType = headResponse.headers['content-type'];
 
-    // Return 1 if it's JPEG, 0 if it's MP4
     if (contentType === 'image/jpeg') {
       return 1;
     } else if (contentType === 'video/mp4') {
@@ -585,5 +692,68 @@ async function checkFileType(url) {
     }
   } catch (error) {
     console.error('An error occurred:', error.message);
+  }
+}
+
+async function compressVideo(inputFilePath, outputFilePath) {
+  try {
+    console.log(`Compressing ${inputFilePath} to ${outputFilePath}`);
+    const { stdout, stderr } = await exec(`ffmpeg -i "${inputFilePath}" -preset veryfast -c:v libx264 -crf 28 "${outputFilePath}"`);
+    console.log('Compression completed successfully');
+    return true;
+  } catch (error) {
+    console.error('Error compressing video:', error);
+    return false;
+  }
+}
+
+async function handleVideoCompression(filePath, sizeLimit) {
+  try {
+    if (!filePath.toLowerCase().endsWith('.mp4')) {
+      console.log('Not a video file, skipping compression');
+      return { shouldCompress: false, compressedFilePath: filePath };
+    }
+    
+    if (sizeLimit !== 10) {
+      console.log('Size limit is not 10MB, skipping compression');
+      return { shouldCompress: false, compressedFilePath: filePath };
+    }
+
+    const stats = fs.statSync(filePath);
+    const fileSizeInMB = stats.size / (1024 * 1024);
+    
+    if (fileSizeInMB >= 40) {
+      console.log('File too large (>=40MB), skipping compression');
+      return { shouldCompress: false, compressedFilePath: filePath };
+    }
+    
+    if (fileSizeInMB <= sizeLimit) {
+      console.log('File already within size limit, skipping compression');
+      return { shouldCompress: false, compressedFilePath: filePath };
+    }
+    
+    const compressedFilePath = filePath.replace('.mp4', 'comp.mp4');
+    console.log('Starting video compression');
+    const compressionResult = await compressVideo(filePath, compressedFilePath);
+    
+    if (compressionResult) {
+      const compressedStats = fs.statSync(compressedFilePath);
+      const compressedSizeInMB = compressedStats.size / (1024 * 1024);
+      
+      if (compressedSizeInMB <= sizeLimit) {
+        console.log(`Compression successful, new size: ${compressedSizeInMB.toFixed(2)}MB`);
+        return { shouldCompress: true, compressedFilePath: compressedFilePath };
+      } else {
+        console.log(`Compression didn't reduce size enough (${compressedSizeInMB.toFixed(2)}MB), using original`);
+        deleteFileAsync(compressedFilePath);
+        return { shouldCompress: false, compressedFilePath: filePath };
+      }
+    } else {
+      console.log('Compression failed, using original file');
+      return { shouldCompress: false, compressedFilePath: filePath };
+    }
+  } catch (error) {
+    console.error('Error in handleVideoCompression:', error);
+    return { shouldCompress: false, compressedFilePath: filePath };
   }
 }
