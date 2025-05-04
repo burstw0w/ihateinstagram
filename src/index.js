@@ -110,12 +110,13 @@ async function handleUrl(msg) {
             await downloadVideo(videoUrl, fname);
             const result = checkFileSize(fname, velicina);
             if (result === 0) {
-              await msg.reply({ content: 'Превелик фајл, ајд да пробам да компресујем' });
+              const compressionMsg = await msg.reply({ content: 'Превелик фајл, ајд да пробам да компресујем' });
               const { shouldCompress, compressedFilePath } = await handleVideoCompression(fname, velicina);
               
               if (shouldCompress) {
                 const compressedResult = checkFileSize(compressedFilePath, velicina);
                 if (compressedResult === 0) {
+                  await compressionMsg.delete().catch(err => console.log("Error deleting compression message: " + err));
                   await msg.reply({ content: 'Фајл је превелик и након компресије јебигони' });
                   deleteFileAsync(fname);
                   deleteFileAsync(compressedFilePath);
@@ -129,6 +130,7 @@ async function handleUrl(msg) {
                   .catch((err) => {
                     console.log("Error during Export File " + err);
                   });
+                await compressionMsg.delete().catch(err => console.log("Error deleting compression message: " + err));
                 msg.delete();
                 deleteFileAsync(fname);
                 deleteFileAsync(compressedFilePath);
@@ -187,12 +189,13 @@ async function handleUrl(msg) {
                 await downloadVideo(videoUrl, fname);
                 const result = checkFileSize(fname, velicina);
                 if (result === 0) {
-                  await msg.reply({ content: 'Превелик фајл, ајд да пробам да компресујем' });
+                  const compressionMsg = await msg.reply({ content: 'Превелик фајл, ајд да пробам да компресујем' });
                   const { shouldCompress, compressedFilePath } = await handleVideoCompression(fname, velicina);
                   
                   if (shouldCompress) {
                     const compressedResult = checkFileSize(compressedFilePath, velicina);
                     if (compressedResult === 0) {
+                      await compressionMsg.delete().catch(err => console.log("Error deleting compression message: " + err));
                       await msg.reply({ content: 'Фајл је превелик и након компресије јебигони' });
                       deleteFileAsync(fname);
                       deleteFileAsync(compressedFilePath);
@@ -206,6 +209,7 @@ async function handleUrl(msg) {
                       .catch((err) => {
                         console.log("Error during Export File " + err);
                       });
+                    await compressionMsg.delete().catch(err => console.log("Error deleting compression message: " + err));
                     msg.delete();
                     deleteFileAsync(fname);
                     deleteFileAsync(compressedFilePath);
@@ -316,12 +320,13 @@ async function handleUrl(msg) {
       const result = checkFileSize(fnamett, velicina);
 
       if (result === 0) {
-        await msg.reply({ content: 'Превелик фајл, ајд да пробам да компресујем' });
+        const compressionMsg = await msg.reply({ content: 'Превелик фајл, ајд да пробам да компресујем' });
         const { shouldCompress, compressedFilePath } = await handleVideoCompression(fnamett, velicina);
         
         if (shouldCompress) {
           const compressedResult = checkFileSize(compressedFilePath, velicina);
           if (compressedResult === 0) {
+            await compressionMsg.delete().catch(err => console.log("Error deleting compression message: " + err));
             await msg.reply({ content: 'Фајл је превелик и након компресије јебигони' });
             deleteFileAsync(fnamett);
             deleteFileAsync(compressedFilePath);
@@ -335,6 +340,7 @@ async function handleUrl(msg) {
             .catch((err) => {
               console.log("Error during Export File " + err);
             });
+          await compressionMsg.delete().catch(err => console.log("Error deleting compression message: " + err));
           msg.delete();
           deleteFileAsync(fnamett);
           deleteFileAsync(compressedFilePath);
@@ -361,12 +367,13 @@ async function handleUrl(msg) {
         await downloadVideo(videoUrl, fnamex);
         const result = checkFileSize(fnamex, velicina);
         if (result === 0) {
-          await msg.reply({ content: 'Превелик фајл, ајд да пробам да компресујем' });
+          const compressionMsg =  await msg.reply({ content: 'Превелик фајл, ајд да пробам да компресујем' });
           const { shouldCompress, compressedFilePath } = await handleVideoCompression(fnamex, velicina);
           
           if (shouldCompress) {
             const compressedResult = checkFileSize(compressedFilePath, velicina);
             if (compressedResult === 0) {
+              await compressionMsg.delete().catch(err => console.log("Error deleting compression message: " + err));
               await msg.reply({ content: 'Фајл је превелик и након компресије јебигони' });
               deleteFileAsync(fnamex);
               deleteFileAsync(compressedFilePath);
@@ -380,6 +387,7 @@ async function handleUrl(msg) {
               .catch((err) => {
                 console.log("Error during Export File " + err);
               });
+            await compressionMsg.delete().catch(err => console.log("Error deleting compression message: " + err));
             msg.delete();
             deleteFileAsync(fnamex);
             deleteFileAsync(compressedFilePath);
@@ -408,12 +416,13 @@ async function handleUrl(msg) {
         await downloadVideo(videoUrl, fnametw);
         const result = checkFileSize(fnametw, velicina);
         if (result === 0) {
-          await msg.reply({ content: 'Превелик фајл, ајд да пробам да компресујем' });
+          const compressionMsg = await msg.reply({ content: 'Превелик фајл, ајд да пробам да компресујем' });
           const { shouldCompress, compressedFilePath } = await handleVideoCompression(fnamew, velicina);
           
           if (shouldCompress) {
             const compressedResult = checkFileSize(compressedFilePath, velicina);
             if (compressedResult === 0) {
+              await compressionMsg.delete().catch(err => console.log("Error deleting compression message: " + err));
               await msg.reply({ content: 'Фајл је превелик и након компресије јебигони' });
               deleteFileAsync(fnametw);
               deleteFileAsync(compressedFilePath);
@@ -427,6 +436,7 @@ async function handleUrl(msg) {
               .catch((err) => {
                 console.log("Error during Export File " + err);
               });
+            await compressionMsg.delete().catch(err => console.log("Error deleting compression message: " + err));
             msg.delete();
             deleteFileAsync(fnametw);
             deleteFileAsync(compressedFilePath);
@@ -451,12 +461,13 @@ async function handleUrl(msg) {
         await downloadVideo(media, fnamerd);
         const result = checkFileSize(fnamerd, velicina);
         if (result === 0) {
-          await msg.reply({ content: 'Превелик фајл, ајд да пробам да компресујем' });
+          const compressionMsg = await msg.reply({ content: 'Превелик фајл, ајд да пробам да компресујем' });
           const { shouldCompress, compressedFilePath } = await handleVideoCompression(fnamerd, velicina);
           
           if (shouldCompress) {
             const compressedResult = checkFileSize(compressedFilePath, velicina);
             if (compressedResult === 0) {
+              await compressionMsg.delete().catch(err => console.log("Error deleting compression message: " + err));
               await msg.reply({ content: 'Фајл је превелик и након компресије јебигони' });
               deleteFileAsync(fnamerd);
               deleteFileAsync(compressedFilePath);
@@ -470,6 +481,7 @@ async function handleUrl(msg) {
               .catch((err) => {
                 console.log("Error during Export File " + err);
               });
+            await compressionMsg.delete().catch(err => console.log("Error deleting compression message: " + err));
             msg.delete();
             deleteFileAsync(fnamerd);
             deleteFileAsync(compressedFilePath);
@@ -494,12 +506,13 @@ async function handleUrl(msg) {
         await downloadVideo(media, fnamepn);
         const result = checkFileSize(fnamepn, velicina);
         if (result === 0) {
-          await msg.reply({ content: 'Превелик фајл, ајд да пробам да компресујем' });
+          const compressionMsg = await msg.reply({ content: 'Превелик фајл, ајд да пробам да компресујем' });
           const { shouldCompress, compressedFilePath } = await handleVideoCompression(fnamepn, velicina);
           
           if (shouldCompress) {
             const compressedResult = checkFileSize(compressedFilePath, velicina);
             if (compressedResult === 0) {
+              await compressionMsg.delete().catch(err => console.log("Error deleting compression message: " + err));
               await msg.reply({ content: 'Фајл је превелик и након компресије јебигони' });
               deleteFileAsync(fnamepn);
               deleteFileAsync(compressedFilePath);
@@ -513,6 +526,7 @@ async function handleUrl(msg) {
               .catch((err) => {
                 console.log("Error during Export File " + err);
               });
+            await compressionMsg.delete().catch(err => console.log("Error deleting compression message: " + err));
             msg.delete();
             deleteFileAsync(fnamepn);
             deleteFileAsync(compressedFilePath);
@@ -698,7 +712,7 @@ async function checkFileType(url) {
 async function compressVideo(inputFilePath, outputFilePath) {
   try {
     console.log(`Compressing ${inputFilePath} to ${outputFilePath}`);
-    const { stdout, stderr } = await exec(`ffmpeg -i "${inputFilePath}" -preset veryfast -c:v libx264 -crf 28 "${outputFilePath}"`);
+    const { stdout, stderr } = await exec(`ffmpeg -i "${inputFilePath}" -c:v libx264 -preset veryfast -crf 32 -c:a aac -b:a 96k -vf "scale=iw*0.75:-1" "${outputFilePath}"`)
     console.log('Compression completed successfully');
     return true;
   } catch (error) {
